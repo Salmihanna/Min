@@ -68,7 +68,8 @@ public class CustomerView {
         switch (choice) {
             case 1:
                 //visa rum
-                
+                database.printOutRooms();
+                database.showRoom();
                 break;
             case 2:
                 //visa tillgängliga rum 

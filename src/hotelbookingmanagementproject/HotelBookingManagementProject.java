@@ -7,12 +7,9 @@ import java.util.Scanner;
 public class HotelBookingManagementProject {
 
     public static Scanner input = new Scanner(System.in);
-    //Lambda
-    static CheckInput check = (s, a, b) -> {
-        return s < a && s > b;
-    };
 
     public static void main(String[] args) {
+        FileHandeling.importFromFile();
         run();
     }
 
@@ -53,8 +50,6 @@ public class HotelBookingManagementProject {
                 while (minRun) {
                     CustomerView newView = new CustomerView();
                     choiceCustomer = newView.customerMenu();
-                    // Check
-                    check.ifInt(choiceCustomer, 8, 0);
                     //Lägg till boolean
                     newView.customerSwitch(choiceCustomer);
                 }
@@ -66,8 +61,6 @@ public class HotelBookingManagementProject {
                 while (minRun) {
                     ReceptionistView newAdminView = new ReceptionistView();
                     choiceAdmin = newAdminView.adminView();
-                    // Check
-                    check.ifInt(choiceAdmin, 9, 0);
                     minRun = newAdminView.adminSwitch(choiceAdmin);
                 }
                 break;

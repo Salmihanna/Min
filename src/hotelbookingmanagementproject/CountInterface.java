@@ -5,6 +5,6 @@
  */
 package hotelbookingmanagementproject;
 
-public interface CheckInput {
-    public boolean ifInt(int s, int max, int min);
+public interface CountInterface {
+    public int intCount(int a, int b, int c);
 }

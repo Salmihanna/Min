@@ -1,5 +1,6 @@
 package hotelbookingmanagementproject;
 
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -7,9 +8,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-public class ConnectToDatabase{
+public class ConnectToDatabase {
     
     public Scanner input = new Scanner(System.in);
     
@@ -29,7 +32,7 @@ public class ConnectToDatabase{
         return connection;
     }
     
-    public void createCustomer(){
+    public void createCustomer() {
         String firstName;
         String lastName;
         
@@ -45,8 +48,7 @@ public class ConnectToDatabase{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        FileHandeling file = new FileHandeling();
-        file.createCustomerFile(firstName, lastName);
+        FileHandeling.createCustomerFile(firstName, lastName);
         System.out.println("\n******Kunden är skapad!******\n");
     }
     
@@ -63,16 +65,19 @@ public class ConnectToDatabase{
             Statement stmt = connection.createStatement();
             stmt.executeUpdate("USE hotel");
             result = stmt.executeQuery("SELECT * FROM customer "
-                    + "\nJOIN bookRoom ON customer.customerId = bookRoom.customerId "
-                    + "\nJOIN rooms ON bookRoom.roomId = rooms.roomId "
+                    + "\nLEFT JOIN bookRoom ON customer.customerId = bookRoom.customerId "
+                    + "\nLEFT JOIN rooms ON bookRoom.roomId = rooms.roomId "
                     + "\nWHERE lastName LIKE '%" + lastName + "%';");
             while (result.next()) {
-                System.out.println("\nFörnamn: " + result.getString("firstName"));
-                System.out.println("Efternamn: " + result.getString("lastName"));
+                //System.out.println("\nFörnamn: " + result.getString("firstName"));
+                //System.out.println("Efternamn: " + result.getString("lastName"));
+                System.out.println();
+                FileHandeling.searchCustomerFile(lastName);
                 System.out.println("Rumsnummer: " + result.getInt("rooms.roomId"));
                 System.out.println("Typ av rum: " + result.getString("typeOfRoom"));
             }
             System.out.println("**********************");
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,6 +114,7 @@ public class ConnectToDatabase{
                     + "\nAND lastName LIKE '" + lastName + "';");
             if (result == 1 && result2 == 1) {
                 System.out.println("\n******Kunder är uppdaterad******");
+                FileHandeling.createCustomerFile(newFirstName, newLastname);
             } else {
                 System.out.println("\n******Uppdateringen misslyckad, dubbelkolla namnet******");
             }
@@ -116,7 +122,7 @@ public class ConnectToDatabase{
         }
     }
     
-    public void delete(String tableName) {
+    public <T> void delete(T tableName) {
         String firstName;
         String lastName;
         int result;
@@ -302,17 +308,24 @@ public class ConnectToDatabase{
         } catch (Exception e) {
         }
     }
+
+    //Lambda
+    CountInterface count = (a, b, c) -> {
+        return a * b + c;
+    };
     
     public void checkOut() {
         int roomId = 0;
         int days = 0;
         int roomPrice = 0;
         int foodPrice = 0;
+        int sum;
         String yesOrNo;
         boolean ifInt = true;
         ResultSet result;
         Connection connection = connect();
         Statement stmt;
+        List<String> list = new ArrayList<>();
         
         while (ifInt) {            
             System.out.print("Ange rumsnummer: ");
@@ -341,18 +354,87 @@ public class ConnectToDatabase{
                 days = result.getInt("days");
                 if (result.isFirst()) {
                     System.out.println("Typ av rum: " + result.getString("typeOfRoom")
-                        + "\nAntal dagar: " + days + "\nPris per natt: " + roomPrice + ":-");
+                            + "\nAntal dagar: " + days + "\nPris per natt: " + roomPrice + ":-");
                 }
                 ExceptionsHandeling pad = new ExceptionsHandeling();
                 System.out.println(result.getString("foodName") + "\nPris: " + food + ":-");
             }
-            System.out.println("\nTotalt: " + ((roomPrice * days) + foodPrice) + ":-");
+            sum = count.intCount(roomPrice, days, foodPrice);
+            System.out.println("\nTotalt: " + sum + ":-");
             System.out.println("Checka ut: ja/nej ");
             yesOrNo = input.next();
             if (yesOrNo.equalsIgnoreCase("ja")) {
                 stmt.executeUpdate("DELETE FROM orderFood "
                         + "\nWHERE roomId = " + roomId);
+                stmt.executeUpdate("UPDATE rooms"
+                        + "\nSET available = TRUE"
+                        + "\nWHERE roomId = " + roomId);
             }
+        } catch (Exception e) {
+        }
+    }
+    
+    public void printOutRooms() {
+        ResultSet result;
+        Connection connection = connect();
+        Statement stmt;
+        ExceptionsHandeling pad = new ExceptionsHandeling();
+        try {
+            stmt = connection.createStatement();
+            result = stmt.executeQuery("SELECT DISTINCT * FROM rooms\n"
+                    + "GROUP BY typeOfRoom;");
+            int columnCount = result.getMetaData().getColumnCount();
+            String[] columnNames = new String[columnCount];
+            for (int i = 0; i < columnCount; i++) {
+                columnNames[i] = result.getMetaData().getColumnName(i + 1);
+            }
+            for (String columnName : columnNames) {
+                System.out.print(pad.PadRight(columnName));
+            }
+            while (result.next()) {                
+                System.out.println();
+                for (String columnName : columnNames) {
+                    String value = result.getString(columnName);
+                    if (value == "1") {
+                        value = "Tillgänglig";
+                    }
+                    System.out.print(pad.PadRight(value));
+                }
+            }
+            System.out.println();
+        } catch (Exception e) {
+        }
+    }
+    
+    public void showRoom(){
+        boolean run = true;
+        int roomId = 0;
+        int numberOfbeds;
+        ResultSet result;
+        Connection connection = connect();
+        Statement stmt;
+        List<String> list = new ArrayList<>();
+        
+        while (run) {            
+            System.out.print("\nAnge rumsnummer: ");
+            if (input.hasNextInt()) {
+                roomId = input.nextInt();
+                run = false;
+            } else {
+                System.err.println("\nSkriv ett heltal");
+            }
+        }
+        try {
+            stmt = connection.createStatement();
+            result = stmt.executeQuery("SELECT * FROM rooms WHERE roomId = " + roomId);
+            if (result.getString("typeOfRoom").equalsIgnoreCase("Singel rum")) {
+                numberOfbeds = 1;
+            } else {
+                numberOfbeds = 2;
+            }
+            System.out.println("Antal sängar: " //+ numberOfbeds 
+                    + "\nAC: YES"
+                    + "\nPris per natt: " + result.getInt("price"));
         } catch (Exception e) {
         }
     }

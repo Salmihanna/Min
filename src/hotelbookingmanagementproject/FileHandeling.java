@@ -11,15 +11,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class FileHandeling implements Serializable{
     //public String fileName = "customers.ser";
-    public Customers customer;
-    public ArrayList<Customers> customerList = new ArrayList<>();
+    static public Customers customer;
+    static public List<Customers> customerList = Arrays.asList();
     
-    public void saveToFile() { // Jag behöver få in en arrayList eller ett object i metoden.
+    public static void saveToFile() { // Jag behöver få in en arrayList eller ett object i metoden.
         try {
             FileOutputStream fos = new FileOutputStream("customers");
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -33,32 +36,38 @@ public class FileHandeling implements Serializable{
         }
     }
     
-    public ArrayList<Customers> importFromFile() {
-        ArrayList<Customers> customerArray = new ArrayList<>();
+    public static List<Customers> importFromFile() {
         try {
             FileInputStream fis = new FileInputStream("customers");
             ObjectInputStream inputStream = new ObjectInputStream(fis);
-            customerArray = (ArrayList<Customers>) inputStream.readObject();
+            customerList = (List<Customers>) inputStream.readObject();
             inputStream.close();
         } catch (IOException ex) {
             System.out.println("Filen finns inte");
         } catch (ClassNotFoundException ex) {
             System.out.println(ex);
         }
-        return customerArray;
+        return customerList;
     }
     
-    public void createCustomerFile(String firstName, String lastName){
+    public static void searchCustomerFile(String lastName){
+        //List<Customers> list = 
+        customerList.stream().filter((s) -> s.getLastName()
+                .equalsIgnoreCase(lastName)).forEach(s -> System.out.println(s.getFirstName() + " " + s.getLastName()));
+    }
+    
+    public static <T> void createCustomerFile(T t1, T t2){
+        String firstName = (String) t1;
+        String lastName = (String) t2;
         Customers customer = new Customers(firstName, lastName);
         customerList.add(customer);
         saveToFile();
     }
     
-    public void loadCustomer(){
-        ArrayList<Customers> customer = importFromFile();
-        for (Customers customers : customer) {
+    public static void loadCustomer(){
+        importFromFile();
+        for (Customers customers : customerList) {
             System.out.println(customers.getFirstName() + " " + customers.getLastName());
         }
-        
     }
 }
