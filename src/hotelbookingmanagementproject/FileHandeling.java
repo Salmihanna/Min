@@ -18,11 +18,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class FileHandeling implements Serializable{
-    //public String fileName = "customers.ser";
     static public Customers customer;
     static public List<Customers> customerList = Arrays.asList();
     
-    public static void saveToFile() { // Jag behöver få in en arrayList eller ett object i metoden.
+    public static void saveToFile() {
         try {
             FileOutputStream fos = new FileOutputStream("customers");
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -50,10 +49,16 @@ public class FileHandeling implements Serializable{
         return customerList;
     }
     
+    //Lambda
     public static void searchCustomerFile(String lastName){
         //List<Customers> list = 
         customerList.stream().filter((s) -> s.getLastName()
                 .equalsIgnoreCase(lastName)).forEach(s -> System.out.println(s.getFirstName() + " " + s.getLastName()));
+    }
+    
+    //method reference
+    public static void printOutCustomer(){
+        customerList.stream().forEach(Customers::printOut);
     }
     
     public static <T> void createCustomerFile(T t1, T t2){

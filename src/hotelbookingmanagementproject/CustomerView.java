@@ -52,7 +52,7 @@ public class CustomerView {
                     + "\n[3] Boka"
                     + "\n[4] Beställ mat"
                     + "\n[5] Checka ut"
-                    + "\n[6] Avsluta");
+                    + "\n[6] Gå tillbaka");
             System.out.print("Välj: ");
             if (input.hasNextInt()) {
                 choice = input.nextInt();
@@ -68,12 +68,12 @@ public class CustomerView {
         switch (choice) {
             case 1:
                 //visa rum
-                database.printOutRooms();
+                database.printOutRooms("inget");
                 database.showRoom();
                 break;
             case 2:
                 //visa tillgängliga rum 
-                
+                database.printOutRooms("available");
                 break;
             case 3:
                 //Boka

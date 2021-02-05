@@ -19,12 +19,13 @@ public class ReceptionistView {
             System.out.println("\n~~~~~~Gör ditt val~~~~~~"
                     + "\n[1] Lägg till en kund"
                     + "\n[2] Söka på kunder"
-                    + "\n[3] Uppdatera kund"
-                    + "\n[4] Radera kund"
-                    + "\n[5] Boka eller uppdatera rum"
-                    + "\n[6] Beställ mat till ett rum"
-                    + "\n[7] Checka ut kund"
-                    + "\n[8] Avsluta");
+                    + "\n[3] Visa alla kunder"
+                    + "\n[4] Uppdatera kund"
+                    + "\n[5] Radera kund"
+                    + "\n[6] Boka eller uppdatera rum"
+                    + "\n[7] Beställ mat till ett rum"
+                    + "\n[8] Checka ut kund"
+                    + "\n[9] Gå tillbaka");
             System.out.print("Välj: ");
             if (input.hasNextInt()) {
                 choice = input.nextInt();
@@ -43,34 +44,36 @@ public class ReceptionistView {
             case 1:
                 //Lägg till kund
                 database.createCustomer();
-//                FileHandeling file = new FileHandeling();
-//                file.loadCustomer();
                 break;
             case 2:
                 //Sök på kund
                 database.searchCustomer();
                 break;
             case 3:
+                // Visa alla kunder
+                FileHandeling.printOutCustomer();
+                break;
+            case 4:
                 //Uppdatera kund 
                 database.updateCustomer();
                 break;
-            case 4:
+            case 5:
                 //radera kund
                 database.delete("customer");
                 break;
-            case 5:
+            case 6:
                 //Boka och uppdatera rum
                 bookOrUpgradeSwitch(bookOrUpgradeView());
                 break;
-            case 6:
+            case 7:
                 //Beställ mat till ett rum
                 database.orderFood();
                 break;
-            case 7:
+            case 8:
                 //Checka ut kund
                 database.checkOut();
                 break;
-            case 8:
+            case 9:
                 //Avsluta
                 run = false;
                 break;
@@ -101,6 +104,7 @@ public class ReceptionistView {
                 database.booking();
                 break;
             case 2:
+                database.printOutRooms("available");
                 database.uppgrade();
                 break;
         }
