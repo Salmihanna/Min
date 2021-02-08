@@ -75,4 +75,12 @@ public class FileHandeling implements Serializable{
             System.out.println(customers.getFirstName() + " " + customers.getLastName());
         }
     }
+    
+    public static void deleteFile(String firstName, String lastName){
+        for (Customers customers : customerList) {
+            if (customers.getFirstName().equalsIgnoreCase(firstName) && customers.getLastName().equalsIgnoreCase(lastName)) {
+                customerList.remove(customers);
+            }
+        }
+    }
 }

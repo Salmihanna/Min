@@ -134,12 +134,13 @@ public class ConnectToDatabase {
         try {
             Statement stmt = connection.createStatement();
 
-            stmt.executeUpdate("USE LIBRARY");
+            stmt.executeUpdate("USE Hotel");
             result = stmt.executeUpdate("DELETE FROM " + tableName
                     + "\nWHERE firstName LIKE '" + firstName + "'"
                     + "\nAND lastname LIKE '" + lastName + "';");
             if (result == 1) {
                 System.out.println("\n******Borttagningen lyckades******");
+                FileHandeling.deleteFile(firstName, lastName);
             } else {
                 System.out.println("\n******Borttagning misslyckad, dubbelkolla namnet******");
             }
@@ -203,12 +204,9 @@ public class ConnectToDatabase {
                         System.err.println("******Måste vara ett heltal******");
                     }
                 }
-                System.out.println("\nFrukost: ja/nej");
-                if (input.next().equalsIgnoreCase("ja")) {
-                    breakfast = true;
-                }
-                stmt.executeLargeUpdate("INSERT INTO bookRoom(customerId, roomId, days, breakfast)"
-                        + "\nVALUES(" + customerId + ", " + roomId + ", " + days + ", " + breakfast + ")");
+               
+                stmt.executeLargeUpdate("INSERT INTO bookRoom(customerId, roomId, days)"
+                        + "\nVALUES(" + customerId + ", " + roomId + ", " + days + ")");
                 stmt.executeUpdate("UPDATE rooms"
                         + "\nSET available = FALSE"
                         + "\nWHERE roomId = " + roomId);

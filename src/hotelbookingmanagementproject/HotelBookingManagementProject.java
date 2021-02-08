@@ -51,7 +51,7 @@ public class HotelBookingManagementProject {
                     CustomerView newView = new CustomerView();
                     choiceCustomer = newView.customerMenu();
                     //Lägg till boolean
-                    newView.customerSwitch(choiceCustomer);
+                    minRun = newView.customerSwitch(choiceCustomer);
                 }
                 break;
             case 2:
